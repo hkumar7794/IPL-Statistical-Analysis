@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Team Deep Analysis | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">Franchise Performance Deep Dive</h1>
+        <p class="hero-subtitle">Season-by-season progression, win/loss breakdowns, and opponent head-to-head records.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Team Selector -->
+    <div class="analytics-card mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <label for="teamSelectDropdown" class="form-label text-muted fw-bold mb-0">Select IPL Franchise:</label>
+            </div>
+            <div class="col-md-9">
+                <select id="teamSelectDropdown" class="form-select form-select-custom fs-5">
+                    <option value="CSK">Chennai Super Kings (CSK)</option>
+                    <option value="MI">Mumbai Indians (MI)</option>
+                    <option value="RCB">Royal Challengers Bengaluru (RCB)</option>
+                    <option value="KKR">Kolkata Knight Riders (KKR)</option>
+                    <option value="SRH">Sunrisers Hyderabad (SRH)</option>
+                    <option value="GT">Gujarat Titans (GT)</option>
+                    <option value="RR">Rajasthan Royals (RR)</option>
+                    <option value="DC">Delhi Capitals (DC)</option>
+                    <option value="PBKS">Punjab Kings (PBKS)</option>
+                    <option value="LSG">Lucknow Super Giants (LSG)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingIndicator" class="spinner-container">
+        <div class="spinner-border text-info mb-3" role="status"></div>
+        <p>Analyzing Team Performance...</p>
+    </div>
+
+    <!-- Content Area -->
+    <div id="teamDetailsContent" style="display: none;">
+        
+        <!-- Header & KPI Row -->
+        <div class="analytics-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-0 text-white" id="teamFullName">--</h2>
+                    <span class="badge fs-6 mt-1" id="teamCodeBadge">--</span>
+                </div>
+                <div id="teamTrophyBadge" class="d-flex align-items-center"></div>
+            </div>
+
+            <div class="row g-3 text-center">
+                <div class="col-6 col-md-2">
+                    <div class="p-3 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Matches</div>
+                        <h4 class="fw-bold text-white mt-1 mb-0" id="statMatches">--</h4>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="p-3 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Wins</div>
+                        <h4 class="fw-bold text-success mt-1 mb-0" id="statWins">--</h4>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="p-3 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Losses</div>
+                        <h4 class="fw-bold text-danger mt-1 mb-0" id="statLosses">--</h4>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="p-3 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Win %</div>
+                        <h4 class="fw-bold text-info mt-1 mb-0" id="statWinPct">--</h4>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="p-3 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Avg Score</div>
+                        <h4 class="fw-bold text-warning mt-1 mb-0" id="statAvgScore">--</h4>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="p-3 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Highest Score</div>
+                        <h4 class="fw-bold text-white mt-1 mb-0" id="statHighest">--</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-bar-chart-line text-info me-2"></i> Season-by-Season Wins & Losses
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="teamSeasonPerfChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-graph-up text-success me-2"></i> Win Rate Progression
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="teamWinRateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opponent Breakdown & Recent Fixtures -->
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-shield text-warning me-2"></i> Record Against Other Franchises
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Opponent</th>
+                                    <th class="text-center">Played</th>
+                                    <th class="text-center">Won</th>
+                                    <th class="text-center">Lost</th>
+                                    <th class="text-end">Win %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="opponentsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-clock-history text-primary me-2"></i> Recent Matches
+                    </h5>
+                    <div id="recentMatchesList" class="d-flex flex-column gap-2"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/team-analysis.js') }}"></script>
+{% endblock %}

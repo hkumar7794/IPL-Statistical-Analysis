@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Players Directory | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">IPL Player Analytics & Career Records</h1>
+        <p class="hero-subtitle">Search batsmen and bowlers, explore career statistics, batting strike rates, averages, and wicket records.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Filters Row -->
+    <div class="analytics-card mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-info"><i class="bi bi-search"></i></span>
+                    <input type="text" id="playerSearchInput" class="form-control form-control-custom" placeholder="Search player name (e.g. Virat Kohli, Bumrah)...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="teamFilterSelect" class="form-select form-select-custom">
+                    <option value="ALL">All IPL Franchises</option>
+                    <option value="CSK">Chennai Super Kings</option>
+                    <option value="MI">Mumbai Indians</option>
+                    <option value="RCB">Royal Challengers Bengaluru</option>
+                    <option value="KKR">Kolkata Knight Riders</option>
+                    <option value="SRH">Sunrisers Hyderabad</option>
+                    <option value="GT">Gujarat Titans</option>
+                    <option value="RR">Rajasthan Royals</option>
+                    <option value="DC">Delhi Capitals</option>
+                    <option value="PBKS">Punjab Kings</option>
+                    <option value="LSG">Lucknow Super Giants</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="roleFilterSelect" class="form-select form-select-custom">
+                    <option value="ALL">All Roles</option>
+                    <option value="Batter">Batters</option>
+                    <option value="Bowler">Bowlers</option>
+                </select>
+            </div>
+            <div class="col-md-1 text-end">
+                <button id="resetFiltersBtn" class="btn btn-outline-secondary w-100" title="Reset Filters">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Players Grid -->
+    <div id="loadingIndicator" class="spinner-container">
+        <div class="spinner-border text-info mb-3" role="status"></div>
+        <p>Loading Players...</p>
+    </div>
+
+    <div id="playersGrid" class="row g-4" style="display: none;"></div>
+    
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <i class="bi bi-person-x fs-1 text-muted"></i>
+        <h4 class="mt-3 text-muted">No players found matching your criteria</h4>
+        <p class="text-secondary">Try searching with a different name or clearing your team/role filter.</p>
+    </div>
+</div>
+
+<!-- Player Career Profile Modal -->
+<div class="modal fade" id="playerProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content analytics-card border-secondary text-white" style="background: #111827;">
+            <div class="modal-header border-secondary">
+                <div>
+                    <h4 class="modal-title fw-bold" id="modalPlayerName">--</h4>
+                    <span class="badge badge-team" id="modalPlayerTeamBadge">--</span>
+                    <span class="badge bg-secondary ms-1" id="modalPlayerRoleBadge">--</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row g-3 text-center mb-4">
+                    <div class="col-4 col-md-2">
+                        <div class="p-2 rounded bg-dark border border-secondary border-opacity-25">
+                            <div class="small text-muted">Matches</div>
+                            <h5 class="fw-bold mt-1 text-info" id="modalMatches">--</h5>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="p-2 rounded bg-dark border border-secondary border-opacity-25">
+                            <div class="small text-muted">Runs</div>
+                            <h5 class="fw-bold mt-1 text-success" id="modalRuns">--</h5>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="p-2 rounded bg-dark border border-secondary border-opacity-25">
+                            <div class="small text-muted">Average</div>
+                            <h5 class="fw-bold mt-1 text-warning" id="modalAverage">--</h5>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="p-2 rounded bg-dark border border-secondary border-opacity-25">
+                            <div class="small text-muted">Strike Rate</div>
+                            <h5 class="fw-bold mt-1 text-primary" id="modalStrikeRate">--</h5>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="p-2 rounded bg-dark border border-secondary border-opacity-25">
+                            <div class="small text-muted">Wickets</div>
+                            <h5 class="fw-bold mt-1 text-danger" id="modalWickets">--</h5>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <div class="p-2 rounded bg-dark border border-secondary border-opacity-25">
+                            <div class="small text-muted">Economy</div>
+                            <h5 class="fw-bold mt-1 text-info" id="modalEconomy">--</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+                            <h6 class="text-muted fw-bold mb-3"><i class="bi bi-award text-warning me-2"></i> Batting Milestones</h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-10">
+                                    <span>Highest Score:</span>
+                                    <strong class="text-white" id="modalHighestScore">--</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-10">
+                                    <span>Centuries (100s):</span>
+                                    <strong class="text-success" id="modalHundreds">--</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-10">
+                                    <span>Half-Centuries (50s):</span>
+                                    <strong class="text-info" id="modalFifties">--</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-1">
+                                    <span>Total Sixes:</span>
+                                    <strong class="text-warning" id="modalSixes">--</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+                            <h6 class="text-muted fw-bold mb-3"><i class="bi bi-shield-check text-info me-2"></i> Bowling & Additional</h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-10">
+                                    <span>Best Figures:</span>
+                                    <strong class="text-white" id="modalBestBowling">--</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-10">
+                                    <span>Deliveries Sample:</span>
+                                    <strong class="text-info" id="modalBallsSample">-- balls</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-10">
+                                    <span>Sample Runs Scored:</span>
+                                    <strong class="text-success" id="modalRunsSample">-- runs</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-1">
+                                    <span>Franchise:</span>
+                                    <strong class="text-warning" id="modalFullFranchise">--</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/players.js') }}"></script>
+{% endblock %}

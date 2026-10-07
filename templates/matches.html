@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Match Explorer | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">IPL Match Explorer & Scorecards</h1>
+        <p class="hero-subtitle">Filter historical IPL fixtures by season, franchise, and venue to inspect detailed match outcomes and player awards.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Filters Row -->
+    <div class="analytics-card mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Season</label>
+                <select id="seasonFilter" class="form-select form-select-custom">
+                    <option value="ALL">All Seasons</option>
+                    <option value="2025">Season 2025</option>
+                    <option value="2024">Season 2024</option>
+                    <option value="2023">Season 2023</option>
+                    <option value="2022">Season 2022</option>
+                    <option value="2021">Season 2021</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Franchise</label>
+                <select id="teamFilter" class="form-select form-select-custom">
+                    <option value="ALL">All Franchises</option>
+                    <option value="CSK">Chennai Super Kings</option>
+                    <option value="MI">Mumbai Indians</option>
+                    <option value="RCB">Royal Challengers Bengaluru</option>
+                    <option value="KKR">Kolkata Knight Riders</option>
+                    <option value="SRH">Sunrisers Hyderabad</option>
+                    <option value="GT">Gujarat Titans</option>
+                    <option value="RR">Rajasthan Royals</option>
+                    <option value="DC">Delhi Capitals</option>
+                    <option value="PBKS">Punjab Kings</option>
+                    <option value="LSG">Lucknow Super Giants</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Stadium / Venue</label>
+                <select id="venueFilter" class="form-select form-select-custom">
+                    <option value="ALL">All Stadiums</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Kolkata">Kolkata</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                    <option value="Jaipur">Jaipur</option>
+                    <option value="Lucknow">Lucknow</option>
+                    <option value="Pune">Pune</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matches Table -->
+    <div class="analytics-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-white mb-0">
+                <i class="bi bi-card-checklist text-info me-2"></i> Match Results Archive
+            </h5>
+            <span class="badge bg-secondary" id="matchCountBadge">-- Matches</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th>Date</th>
+                        <th>Season</th>
+                        <th>Fixture (Team 1 vs Team 2)</th>
+                        <th>Venue</th>
+                        <th class="text-center">Scores</th>
+                        <th>Winner</th>
+                        <th>Player of Match</th>
+                        <th class="text-end">Scorecard</th>
+                    </tr>
+                </thead>
+                <tbody id="matchesTableBody">
+                    <tr><td colspan="9" class="text-center py-4 text-muted">Loading match fixtures...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Match Scorecard Modal -->
+<div class="modal fade" id="matchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content analytics-card border-secondary text-white" style="background: #111827;">
+            <div class="modal-header border-secondary">
+                <div>
+                    <h5 class="modal-title fw-bold" id="modalMatchTitle">--</h5>
+                    <span class="small text-muted" id="modalMatchSubtitle">--</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row g-3 text-center mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+                            <h5 class="text-info fw-bold mb-1" id="modalTeam1Name">--</h5>
+                            <h3 class="fw-bold text-white" id="modalTeam1Score">--</h3>
+                            <span class="small text-muted">1st Innings</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+                            <h5 class="text-warning fw-bold mb-1" id="modalTeam2Name">--</h5>
+                            <h3 class="fw-bold text-white" id="modalTeam2Score">--</h3>
+                            <span class="small text-muted">2nd Innings</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <span class="text-muted small">Toss Winner:</span>
+                            <strong class="text-white ms-1" id="modalTossWinner">--</strong> 
+                            <span class="badge bg-secondary ms-1" id="modalTossDecision">--</span>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <span class="text-muted small">Winner:</span>
+                            <span class="badge badge-win fs-6 ms-1" id="modalWinnerBadge">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded bg-warning bg-opacity-10 border border-warning border-opacity-25 d-flex align-items-center">
+                    <i class="bi bi-award-fill text-warning fs-3 me-3"></i>
+                    <div>
+                        <div class="small text-warning text-uppercase fw-bold">Player of the Match</div>
+                        <h5 class="fw-bold text-white mb-0" id="modalPotm">--</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/matches.js') }}"></script>
+{% endblock %}

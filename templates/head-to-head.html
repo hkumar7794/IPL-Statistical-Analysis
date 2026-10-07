@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Head-to-Head Comparison | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">Head-to-Head Franchise Comparison</h1>
+        <p class="hero-subtitle">Select any two IPL teams to compare head-to-head records, win rates, historical encounters, and average scores.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Team Selectors Card -->
+    <div class="analytics-card mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <label class="form-label text-muted fw-bold small text-uppercase">Team A</label>
+                <select id="teamASelect" class="form-select form-select-custom fs-5">
+                    <option value="MI" selected>Mumbai Indians (MI)</option>
+                    <option value="CSK">Chennai Super Kings (CSK)</option>
+                    <option value="RCB">Royal Challengers Bengaluru (RCB)</option>
+                    <option value="KKR">Kolkata Knight Riders (KKR)</option>
+                    <option value="SRH">Sunrisers Hyderabad (SRH)</option>
+                    <option value="GT">Gujarat Titans (GT)</option>
+                    <option value="RR">Rajasthan Royals (RR)</option>
+                    <option value="DC">Delhi Capitals (DC)</option>
+                    <option value="PBKS">Punjab Kings (PBKS)</option>
+                    <option value="LSG">Lucknow Super Giants (LSG)</option>
+                </select>
+            </div>
+            <div class="col-md-2 text-center pt-md-4">
+                <span class="fs-4 fw-bold text-info">VS</span>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label text-muted fw-bold small text-uppercase">Team B</label>
+                <select id="teamBSelect" class="form-select form-select-custom fs-5">
+                    <option value="CSK" selected>Chennai Super Kings (CSK)</option>
+                    <option value="MI">Mumbai Indians (MI)</option>
+                    <option value="RCB">Royal Challengers Bengaluru (RCB)</option>
+                    <option value="KKR">Kolkata Knight Riders (KKR)</option>
+                    <option value="SRH">Sunrisers Hyderabad (SRH)</option>
+                    <option value="GT">Gujarat Titans (GT)</option>
+                    <option value="RR">Rajasthan Royals (RR)</option>
+                    <option value="DC">Delhi Capitals (DC)</option>
+                    <option value="PBKS">Punjab Kings (PBKS)</option>
+                    <option value="LSG">Lucknow Super Giants (LSG)</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <button id="compareBtn" class="btn btn-info px-4 fw-bold">
+                <i class="bi bi-arrows-collapse me-1"></i> Compare Franchises
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingIndicator" class="spinner-container" style="display: none;">
+        <div class="spinner-border text-info mb-3" role="status"></div>
+        <p>Comparing Teams...</p>
+    </div>
+
+    <!-- Comparison Results -->
+    <div id="comparisonResults" style="display: none;">
+        
+        <!-- Comparison Cards Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-5">
+                <div class="analytics-card text-center border-top border-4" id="cardTeamA">
+                    <h3 class="fw-bold mb-1 text-white" id="nameTeamA">--</h3>
+                    <span class="badge fs-6 mb-3" id="badgeTeamA">--</span>
+                    <div class="display-4 fw-bold text-info" id="winsTeamA">0</div>
+                    <div class="text-muted small text-uppercase mb-3">Victories in Encounters</div>
+                    <div class="p-2 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Win Percentage: <strong class="text-white" id="pctTeamA">0%</strong></div>
+                        <div class="small text-muted">Avg Score in Matchups: <strong class="text-warning" id="avgTeamA">0</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2 d-flex flex-column justify-content-center align-items-center text-center">
+                <div class="analytics-card w-100 py-3">
+                    <div class="text-muted small text-uppercase">Total Clashes</div>
+                    <div class="fs-2 fw-bold text-white" id="totalClashes">0</div>
+                    <span class="badge bg-secondary mt-1">Head-to-Head</span>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="analytics-card text-center border-top border-4" id="cardTeamB">
+                    <h3 class="fw-bold mb-1 text-white" id="nameTeamB">--</h3>
+                    <span class="badge fs-6 mb-3" id="badgeTeamB">--</span>
+                    <div class="display-4 fw-bold text-warning" id="winsTeamB">0</div>
+                    <div class="text-muted small text-uppercase mb-3">Victories in Encounters</div>
+                    <div class="p-2 rounded bg-dark bg-opacity-50">
+                        <div class="small text-muted">Win Percentage: <strong class="text-white" id="pctTeamB">0%</strong></div>
+                        <div class="small text-muted">Avg Score in Matchups: <strong class="text-warning" id="avgTeamB">0</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Chart & Matches List -->
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-bar-chart-fill text-info me-2"></i> Win Share & Score Comparison
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="h2hChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-list-check text-success me-2"></i> Historical Match Encounters
+                    </h5>
+                    <div id="h2hMatchesList" class="d-flex flex-column gap-2" style="max-height: 350px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/head-to-head.js') }}"></script>
+{% endblock %}

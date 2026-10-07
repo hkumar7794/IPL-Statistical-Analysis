@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Batting Analytics | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">IPL Batting Records & Leaderboards</h1>
+        <p class="hero-subtitle">Explore tournament run-scorers, batting averages, boundary counts, and destructive strike rates.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Filter Bar -->
+    <div class="analytics-card mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Season</label>
+                <select id="seasonFilter" class="form-select form-select-custom">
+                    <option value="ALL">All Seasons Combined</option>
+                    <option value="2025">Season 2025</option>
+                    <option value="2024">Season 2024</option>
+                    <option value="2023">Season 2023</option>
+                    <option value="2022">Season 2022</option>
+                    <option value="2021">Season 2021</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Sort Leaderboard By</label>
+                <select id="sortFilter" class="form-select form-select-custom">
+                    <option value="runs">Total Runs Scored</option>
+                    <option value="strike_rate">Batting Strike Rate</option>
+                    <option value="average">Batting Average</option>
+                    <option value="sixes">Total Sixes</option>
+                    <option value="hundreds">Centuries (100s)</option>
+                    <option value="fifties">Half-Centuries (50s)</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Display Limit</label>
+                <select id="limitFilter" class="form-select form-select-custom">
+                    <option value="10">Top 10 Batsmen</option>
+                    <option value="20" selected>Top 20 Batsmen</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-fire text-danger me-2"></i> Top Run Scorers Leaderboard
+                </h5>
+                <div class="chart-container">
+                    <canvas id="topScorersChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-lightning-charge-fill text-warning me-2"></i> Highest Strike Rates
+                </h5>
+                <div class="chart-container">
+                    <canvas id="strikeRateChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div class="analytics-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-white mb-0">
+                <i class="bi bi-trophy text-info me-2"></i> Detailed Batting Leaderboard
+            </h5>
+            <span class="badge bg-secondary" id="leaderboardCountBadge">--</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th class="text-center">Rank</th>
+                        <th>Player Name</th>
+                        <th>Team</th>
+                        <th class="text-center">Matches</th>
+                        <th class="text-end">Runs</th>
+                        <th class="text-end">Avg</th>
+                        <th class="text-end">Strike Rate</th>
+                        <th class="text-center">50s</th>
+                        <th class="text-center">100s</th>
+                        <th class="text-center">6s</th>
+                    </tr>
+                </thead>
+                <tbody id="battingTableBody">
+                    <tr><td colspan="10" class="text-center py-4 text-muted">Loading leaderboard data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/batting.js') }}"></script>
+{% endblock %}

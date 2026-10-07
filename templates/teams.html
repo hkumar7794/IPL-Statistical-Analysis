@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}IPL Teams | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">IPL Franchises & Team Records</h1>
+        <p class="hero-subtitle">Explore historical performance, championship titles, total runs scored, and win rates for all 10 IPL teams.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Loading State -->
+    <div id="loadingIndicator" class="spinner-container">
+        <div class="spinner-border text-info mb-3" role="status"></div>
+        <p>Loading IPL Teams Data...</p>
+    </div>
+
+    <!-- Teams Cards Grid -->
+    <div id="teamsGrid" class="row g-4" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/teams.js') }}"></script>
+{% endblock %}

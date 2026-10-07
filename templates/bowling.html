@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Bowling Analytics | IPL Statistical Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">IPL Bowling Records & Leaderboards</h1>
+        <p class="hero-subtitle">Discover leading wicket-takers, economical match-winners, and elite bowling averages.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Filter Bar -->
+    <div class="analytics-card mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Season</label>
+                <select id="seasonFilter" class="form-select form-select-custom">
+                    <option value="ALL">All Seasons Combined</option>
+                    <option value="2025">Season 2025</option>
+                    <option value="2024">Season 2024</option>
+                    <option value="2023">Season 2023</option>
+                    <option value="2022">Season 2022</option>
+                    <option value="2021">Season 2021</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Sort Leaderboard By</label>
+                <select id="sortFilter" class="form-select form-select-custom">
+                    <option value="wickets">Total Wickets</option>
+                    <option value="economy">Economy Rate (Best)</option>
+                    <option value="average">Bowling Average</option>
+                    <option value="matches">Matches Played</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold text-uppercase mb-1">Display Limit</label>
+                <select id="limitFilter" class="form-select form-select-custom">
+                    <option value="10">Top 10 Bowlers</option>
+                    <option value="20" selected>Top 20 Bowlers</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-bullseye text-danger me-2"></i> Leading Wicket Takers
+                </h5>
+                <div class="chart-container">
+                    <canvas id="topWicketsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-shield-shaded text-info me-2"></i> Best Economy Rates
+                </h5>
+                <div class="chart-container">
+                    <canvas id="economyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div class="analytics-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-white mb-0">
+                <i class="bi bi-trophy text-info me-2"></i> Detailed Bowling Leaderboard
+            </h5>
+            <span class="badge bg-secondary" id="bowlerCountBadge">--</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th class="text-center">Rank</th>
+                        <th>Player Name</th>
+                        <th>Team</th>
+                        <th class="text-center">Matches</th>
+                        <th class="text-end">Wickets</th>
+                        <th class="text-end">Economy Rate</th>
+                        <th class="text-end">Bowling Avg</th>
+                    </tr>
+                </thead>
+                <tbody id="bowlingTableBody">
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Loading leaderboard data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/bowling.js') }}"></script>
+{% endblock %}
